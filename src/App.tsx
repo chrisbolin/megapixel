@@ -71,15 +71,13 @@ function BoxRow({ row, yIndex }: { row: Array<NullableNumber>, yIndex: number })
   </>
 }
 
-function BoxGrid({ grid }: { grid: Grid }) {
+function BoxGrid({ grid, widthInBoxes, heightInBoxes }: { grid: Grid, widthInBoxes: number, heightInBoxes: number }) {
   const [count, setCount] = React.useState(0);
 
-  const widthInBoxes = 6;
-  const heightInBoxes = 10;
   const pixelsPerBox = 10;
   const viewBox = `0 0 ${widthInBoxes * pixelsPerBox} ${heightInBoxes * pixelsPerBox}`;
 
-  function increaseCount() {
+  function forceUpdate() {
     setCount(count + 1);
   }
 
@@ -94,32 +92,29 @@ function BoxGrid({ grid }: { grid: Grid }) {
     return {};
   }
 
-  function handleTouchStart(event: React.TouchEvent<SVGElement>) {
-
-  }
-
-  function handleTouchMove(event: React.TouchEvent<SVGElement>) {
+  function handleTouchChange(event: React.TouchEvent<SVGElement>) {
     const { x, y, value } = getBoxFromEvent(grid, event);
-
     if (value === undefined) return;
     grid.set(x, y, 3);
-    increaseCount();
-    console.log({ x, y, value });
+    forceUpdate();
   }
 
   return <svg
     viewBox={viewBox}
-    onTouchMove={handleTouchMove}
+    onTouchMove={handleTouchChange}
+    onTouchStart={handleTouchChange}
   >
     {grid.data.map((row, yIndex) => <BoxRow row={row} yIndex={yIndex} key={yIndex} />)}
   </svg >
 }
 
 function App() {
-  const grid = randomGrid(6, 10, 3);
+  const widthInBoxes = 7;
+  const heightInBoxes = 7;
+  const grid = randomGrid(widthInBoxes, heightInBoxes, 3);
   return (
     <div className="App">
-      <BoxGrid grid={grid} />
+      <BoxGrid grid={grid} widthInBoxes={widthInBoxes} heightInBoxes={heightInBoxes} />
     </div>
   );
 }
