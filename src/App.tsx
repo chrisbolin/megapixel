@@ -109,8 +109,9 @@ function BoxGrid({ grid, widthInBoxes, heightInBoxes }: { grid: Grid, widthInBox
 }
 
 function App() {
-  const widthInBoxes = 7;
-  const heightInBoxes = 7;
+  const dimensionInBoxes = 8;
+  const widthInBoxes = dimensionInBoxes;
+  const heightInBoxes = dimensionInBoxes;
   const grid = randomGrid(widthInBoxes, heightInBoxes, 3);
   return (
     <div className="App">
