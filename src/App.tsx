@@ -17,7 +17,7 @@ type GridData = Array<Array<NullableNumber>>;
 class Grid {
   data: GridData;
 
-  constructor(data: GridData) {
+  constructor(data: GridData = []) {
     this.data = data;
   }
 
@@ -114,7 +114,7 @@ function App() {
   const dimensionInBoxes = 8;
   const widthInBoxes = dimensionInBoxes;
   const heightInBoxes = dimensionInBoxes;
-  const grid = randomGrid(1, 1, 3);
+  const grid = new Grid();
   return (
     <div className="App">
       <BoxGrid grid={grid} widthInBoxes={widthInBoxes} heightInBoxes={heightInBoxes} />
