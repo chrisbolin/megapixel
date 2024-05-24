@@ -2,56 +2,7 @@ import React from 'react';
 
 import './App.css';
 
-export function identity(x: any) {
-  return x;
-}
-
-type NullableNumber = number | null;
-type GridData = Array<Array<NullableNumber>>;
-// [
-//   [1,2],
-//   [3,4],
-// ]
-// Grid[yIndex][xIndex]
-
-class Grid {
-  data: GridData;
-
-  constructor(data: GridData = []) {
-    this.data = data;
-  }
-
-  get(xIndex: number, yIndex: number) {
-    const row = this.data[yIndex] || [];
-    return row[xIndex];
-  }
-
-  set(xIndex: number, yIndex: number, value: number) {
-    this.ensureRow(yIndex);
-    this.data[yIndex][xIndex] = value;
-  }
-
-  ensureRow(yIndex: number) {
-    if (this.data[yIndex] === undefined) {
-      this.data[yIndex] = [];
-    }
-  }
-}
-
-function range(length: number) {
-  return new Array(length)
-    .fill(0)
-    .map((_, index) => index);
-}
-
-function randomInt(upperBoundExclusive: number) {
-  return Math.floor(Math.random() * upperBoundExclusive);
-}
-
-function randomGrid(x: number, y: number, max: number) {
-  const data = range(y).map(() => range(x).map(() => randomInt(max)));
-  return new Grid(data);
-}
+import { Grid, NullableNumber } from './Grid';
 
 function Box({ value, xIndex, yIndex }: { value: NullableNumber, yIndex: number, xIndex: number }) {
   const colors = ['yellow', 'red', 'blue'];
