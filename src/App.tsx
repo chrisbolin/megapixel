@@ -27,12 +27,14 @@ class Grid {
   }
 
   set(xIndex: number, yIndex: number, value: number) {
+    this.ensureRow(yIndex);
     this.data[yIndex][xIndex] = value;
   }
 
-  ensureSize(xMin: number, yMin: number) {
-    // first check number rows with yMin
-    // then check contents of rows with xMin
+  ensureRow(yIndex: number) {
+    if (this.data[yIndex] === undefined) {
+      this.data[yIndex] = [];
+    }
   }
 }
 
@@ -93,8 +95,8 @@ function BoxGrid({ grid, widthInBoxes, heightInBoxes }: { grid: Grid, widthInBox
   }
 
   function handleTouchChange(event: React.TouchEvent<SVGElement>) {
-    const { x, y, value } = getBoxFromEvent(grid, event);
-    if (value === undefined) return;
+    const { x, y } = getBoxFromEvent(grid, event);
+    if (x === undefined) return;
     grid.set(x, y, 3);
     forceUpdate();
   }
@@ -112,7 +114,7 @@ function App() {
   const dimensionInBoxes = 8;
   const widthInBoxes = dimensionInBoxes;
   const heightInBoxes = dimensionInBoxes;
-  const grid = randomGrid(widthInBoxes, heightInBoxes, 3);
+  const grid = randomGrid(1, 1, 3);
   return (
     <div className="App">
       <BoxGrid grid={grid} widthInBoxes={widthInBoxes} heightInBoxes={heightInBoxes} />
