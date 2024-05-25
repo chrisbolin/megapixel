@@ -40,19 +40,27 @@ function BoxGrid({ state, widthInBoxes, heightInBoxes, palette }: { state: AppSt
 
   function getBoxFromEvent(grid: Grid, event: React.TouchEvent<SVGElement>) {
     const { clientX, clientY, target } = event.touches[0];
-    if (target instanceof Element && target.parentElement) {
-      const x = Math.floor(clientX / target.parentElement.clientWidth * widthInBoxes);
-      const y = Math.floor(clientY / target.parentElement.clientHeight * heightInBoxes);
-      const value = grid.get(x, y);
-      return { x, y, value };
+
+    if (!(target instanceof Element && target.nodeName && target.parentElement)) {
+      throw new Error('Unexpected Box touch event');
     }
-    return {};
+
+    let measuredElement: Element;
+    if (target.nodeName === "svg") {
+      measuredElement = target;
+    } else if (target.nodeName === "rect") {
+      measuredElement = target.parentElement;
+    } else {
+      throw new Error(`target.nodeName unexpected: ${target.nodeName}.`);
+    }
+    const x = Math.floor(clientX / measuredElement.clientWidth * widthInBoxes);
+    const y = Math.floor(clientY / measuredElement.clientHeight * heightInBoxes);
+    const value = grid.get(x, y);
+    return { x, y, value };
   }
 
   function handleTouchChange(event: React.TouchEvent<SVGElement>) {
     const { x, y, value } = getBoxFromEvent(state.grid, event);
-
-    if (x === undefined || y === undefined) return;
 
     if (typeof value !== 'number') {
       state.grid.set(x, y, state.currentColorIndex);
@@ -67,13 +75,25 @@ function BoxGrid({ state, widthInBoxes, heightInBoxes, palette }: { state: AppSt
     onTouchStart={handleTouchChange}
   >
     {state.grid.data.map((row, yIndex) => <BoxRow row={row} yIndex={yIndex} key={yIndex} palette={palette} />)}
-  </svg >
+  </svg>
 }
 
 function ColorPicker({ state, palette }: { state: AppState, palette: Palette }) {
-  return <>
-    {palette.map((color, index) => <button onClick={() => state.setCurrentColorIndex(index)}>{color}</button>)}
-  </>;
+  const dimensionInPixels = 10;
+  const viewBox = `0 0 ${palette.length * dimensionInPixels} ${3 * dimensionInPixels}`;
+  return <svg viewBox={viewBox}>
+    {palette.map((color, index) =>
+      <rect
+        onClick={() => state.setCurrentColorIndex(index)}
+        key={color}
+        fill={color}
+        width={dimensionInPixels}
+        height={dimensionInPixels}
+        x={index * dimensionInPixels}
+        y={0}
+      />)
+    }
+  </svg>;
 }
 
 function App() {
