@@ -88,16 +88,19 @@ function ColorPicker({ state, palette }: { state: AppState, palette: Palette }) 
   const dimensionInPixels = 10;
   const viewBox = `0 0 ${palette.length * dimensionInPixels} ${3 * dimensionInPixels}`;
   return <svg viewBox={viewBox}>
-    {palette.map((color, index) =>
-      <rect
+    {palette.map((color, index) => {
+      const active = index === state.currentColorIndex;
+      return <rect
         onClick={() => state.setCurrentColorIndex(index)}
         key={color}
         fill={color}
         width={dimensionInPixels}
         height={dimensionInPixels}
         x={index * dimensionInPixels}
+        rx={active ? 0 : dimensionInPixels / 2}
         y={0}
-      />)
+      />
+    })
     }
   </svg>;
 }
