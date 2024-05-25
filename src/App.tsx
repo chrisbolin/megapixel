@@ -1,8 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import './App.css';
 
 import { Grid, NullableNumber } from './Grid';
+
+function useAppState() {
+  const [currentColorIndex, setCurrentColorIndex] = useState(0);
+  return { currentColorIndex, setCurrentColorIndex };
+}
+
+type AppState = ReturnType<typeof useAppState>;
 
 function Box({ value, xIndex, yIndex }: { value: NullableNumber, yIndex: number, xIndex: number }) {
   const colors = ['yellow', 'red', 'blue'];
@@ -24,7 +31,7 @@ function BoxRow({ row, yIndex }: { row: Array<NullableNumber>, yIndex: number })
   </>
 }
 
-function BoxGrid({ grid, widthInBoxes, heightInBoxes }: { grid: Grid, widthInBoxes: number, heightInBoxes: number }) {
+function BoxGrid({ grid, widthInBoxes, heightInBoxes, state }: { grid: Grid, widthInBoxes: number, heightInBoxes: number, state: AppState }) {
   const [count, setCount] = React.useState(0);
 
   const pixelsPerBox = 10;
@@ -46,10 +53,18 @@ function BoxGrid({ grid, widthInBoxes, heightInBoxes }: { grid: Grid, widthInBox
   }
 
   function handleTouchChange(event: React.TouchEvent<SVGElement>) {
-    const { x, y } = getBoxFromEvent(grid, event);
+    const { x, y, value } = getBoxFromEvent(grid, event);
+    console.log(getBoxFromEvent(grid, event));
     if (x === undefined) return;
-    grid.set(x, y, 3);
-    forceUpdate();
+    if (typeof value !== 'number') {
+      grid.set(x, y, state.currentColorIndex);
+      forceUpdate();
+    } else {
+      state.setCurrentColorIndex(value);
+    }
+
+
+
   }
 
   return <svg
@@ -62,13 +77,18 @@ function BoxGrid({ grid, widthInBoxes, heightInBoxes }: { grid: Grid, widthInBox
 }
 
 function App() {
+  const state = useAppState();
+  const [grid] = useState(new Grid());
   const dimensionInBoxes = 8;
   const widthInBoxes = dimensionInBoxes;
   const heightInBoxes = dimensionInBoxes;
-  const grid = new Grid();
   return (
     <div className="App">
-      <BoxGrid grid={grid} widthInBoxes={widthInBoxes} heightInBoxes={heightInBoxes} />
+      <BoxGrid grid={grid} widthInBoxes={widthInBoxes} heightInBoxes={heightInBoxes} state={state} />
+      <button onClick={() => state.setCurrentColorIndex(0)}>0</button>
+      <button onClick={() => state.setCurrentColorIndex(1)}>1</button>
+      <button onClick={() => state.setCurrentColorIndex(2)}>2</button>
+      <button onClick={() => state.setCurrentColorIndex(3)}>3</button>
     </div>
   );
 }
