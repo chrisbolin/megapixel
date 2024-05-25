@@ -13,7 +13,14 @@ export class Grid {
     this.updateCallback = () => { };
   }
 
-  get(xIndex: number, yIndex: number) {
+  get size(): [number, number] {
+    const ySize = this.data.length;
+    const rowLengths = this.data.map(row => row.length).filter(Boolean);
+    const xSize = Math.max(...rowLengths);
+    return [xSize, ySize];
+  }
+
+  valueAt(xIndex: number, yIndex: number) {
     const row = this.data[yIndex] || [];
     return row[xIndex];
   }

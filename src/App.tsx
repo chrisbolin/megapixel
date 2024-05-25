@@ -53,7 +53,7 @@ function BoxGrid(
     }
     const x = Math.floor(clientX / measuredElement.clientWidth * widthInBoxes);
     const y = Math.floor(clientY / measuredElement.clientHeight * heightInBoxes);
-    const value = grid.get(x, y);
+    const value = grid.valueAt(x, y);
     return { x, y, value };
   }
 
@@ -86,7 +86,7 @@ function BoxGrid(
 
 function ColorPicker({ state, palette }: { state: AppState, palette: Palette }) {
   const dimensionInPixels = 10;
-  const viewBox = `0 0 ${palette.length * dimensionInPixels} ${3 * dimensionInPixels}`;
+  const viewBox = `0 0 ${palette.length * dimensionInPixels} ${dimensionInPixels}`;
   return <svg viewBox={viewBox}>
     {palette.map((color, index) => {
       const active = index === state.currentColorIndex;
@@ -122,6 +122,7 @@ function App() {
         pixelsPerBox={pixelsPerBox}
       />
       <ColorPicker state={state} palette={palette} />
+      {JSON.stringify(state.grid.size)}
     </div>
   );
 }
