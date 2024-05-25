@@ -30,19 +30,6 @@ function Box(
   />;
 }
 
-function BoxRow({ row, yIndex, palette, pixelsPerBox }: { row: Array<NullableNumber>, yIndex: number, palette: Palette, pixelsPerBox: number }) {
-  return <>
-    {row.map((value, index) => <Box
-      value={value}
-      yIndex={yIndex}
-      xIndex={index}
-      palette={palette}
-      pixelsPerBox={pixelsPerBox}
-      key={index}
-    />)}
-  </>
-}
-
 function BoxGrid(
   { state, widthInBoxes, heightInBoxes, palette, pixelsPerBox }:
     { state: AppState, widthInBoxes: number, heightInBoxes: number, palette: Palette, pixelsPerBox: number }
@@ -85,7 +72,15 @@ function BoxGrid(
     onTouchMove={handleTouchChange}
     onTouchStart={handleTouchChange}
   >
-    {state.grid.data.map((row, yIndex) => <BoxRow row={row} yIndex={yIndex} key={yIndex} palette={palette} pixelsPerBox={pixelsPerBox} />)}
+    {state.grid.data.map((row, yIndex) => row.map((value, index) => <Box
+      value={value}
+      yIndex={yIndex}
+      xIndex={index}
+      palette={palette}
+      pixelsPerBox={pixelsPerBox}
+      key={index}
+    />))
+    }
   </svg>
 }
 
@@ -113,7 +108,7 @@ function App() {
   const pixelsPerBox = 30;
   const widthInBoxes = dimensionInBoxes;
   const heightInBoxes = dimensionInBoxes;
-  const palette = ['yellow', 'blue', 'red', 'black'];
+  const palette = ['yellow', 'blue', 'red'];
   return (
     <div className="App">
       <BoxGrid
