@@ -15,27 +15,38 @@ type AppState = ReturnType<typeof useAppState>;
 
 type Palette = Array<string>;
 
-function Box({ value, xIndex, yIndex, palette }: { value: NullableNumber, yIndex: number, xIndex: number, palette: Palette }) {
+function Box(
+  { value, xIndex, yIndex, palette, pixelsPerBox }:
+    { value: NullableNumber, yIndex: number, xIndex: number, palette: Palette, pixelsPerBox: number }
+) {
   const color = value !== null ? palette[value] : 'lightgrey'; // backup color
-  const baseDimension = 10;
-  const oversizeDimension = baseDimension + 1; // oversize the width and height to fill small gap in browser rendering
+  const oversizeDimension = pixelsPerBox + 1; // oversize the width and height to fill small gap in browser rendering
   return <rect
     width={oversizeDimension}
     height={oversizeDimension}
     fill={color}
-    x={xIndex * 10}
-    y={yIndex * 10}
+    x={xIndex * pixelsPerBox}
+    y={yIndex * pixelsPerBox}
   />;
 }
 
-function BoxRow({ row, yIndex, palette }: { row: Array<NullableNumber>, yIndex: number, palette: Palette }) {
+function BoxRow({ row, yIndex, palette, pixelsPerBox }: { row: Array<NullableNumber>, yIndex: number, palette: Palette, pixelsPerBox: number }) {
   return <>
-    {row.map((value, index) => <Box value={value} yIndex={yIndex} xIndex={index} key={index} palette={palette} />)}
+    {row.map((value, index) => <Box
+      value={value}
+      yIndex={yIndex}
+      xIndex={index}
+      palette={palette}
+      pixelsPerBox={pixelsPerBox}
+      key={index}
+    />)}
   </>
 }
 
-function BoxGrid({ state, widthInBoxes, heightInBoxes, palette }: { state: AppState, widthInBoxes: number, heightInBoxes: number, palette: Palette }) {
-  const pixelsPerBox = 10;
+function BoxGrid(
+  { state, widthInBoxes, heightInBoxes, palette, pixelsPerBox }:
+    { state: AppState, widthInBoxes: number, heightInBoxes: number, palette: Palette, pixelsPerBox: number }
+) {
   const viewBox = `0 0 ${widthInBoxes * pixelsPerBox} ${heightInBoxes * pixelsPerBox}`;
 
   function getBoxFromEvent(grid: Grid, event: React.TouchEvent<SVGElement>) {
@@ -74,7 +85,7 @@ function BoxGrid({ state, widthInBoxes, heightInBoxes, palette }: { state: AppSt
     onTouchMove={handleTouchChange}
     onTouchStart={handleTouchChange}
   >
-    {state.grid.data.map((row, yIndex) => <BoxRow row={row} yIndex={yIndex} key={yIndex} palette={palette} />)}
+    {state.grid.data.map((row, yIndex) => <BoxRow row={row} yIndex={yIndex} key={yIndex} palette={palette} pixelsPerBox={pixelsPerBox} />)}
   </svg>
 }
 
@@ -99,12 +110,19 @@ function ColorPicker({ state, palette }: { state: AppState, palette: Palette }) 
 function App() {
   const state = useAppState();
   const dimensionInBoxes = 8;
+  const pixelsPerBox = 30;
   const widthInBoxes = dimensionInBoxes;
   const heightInBoxes = dimensionInBoxes;
-  const palette = ['yellow', 'blue', 'red'];
+  const palette = ['yellow', 'blue', 'red', 'black'];
   return (
     <div className="App">
-      <BoxGrid widthInBoxes={widthInBoxes} heightInBoxes={heightInBoxes} state={state} palette={palette} />
+      <BoxGrid
+        widthInBoxes={widthInBoxes}
+        heightInBoxes={heightInBoxes}
+        state={state}
+        palette={palette}
+        pixelsPerBox={pixelsPerBox}
+      />
       <ColorPicker state={state} palette={palette} />
     </div>
   );
