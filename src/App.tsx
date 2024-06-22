@@ -61,9 +61,8 @@ function BoxGrid(
     const { x, y, value } = getBoxFromEvent(state.grid, event);
 
     if (typeof value !== 'number') {
+      // no value selected
       state.grid.set(x, y, state.currentColorIndex);
-    } else {
-      state.setCurrentColorIndex(value);
     }
   }
 
