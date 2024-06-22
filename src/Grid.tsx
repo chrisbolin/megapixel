@@ -1,15 +1,21 @@
 import { useState } from "react";
-import { range, randomInt } from "./utils";
+import { range } from "./utils";
 
 export type NullableNumber = number | null;
 type GridData = Array<Array<NullableNumber>>;
+export type GridContructorParams = {
+  data?: GridData,
+  viewSquareSize: number,
+};
 
 export class Grid {
   data: GridData;
   updateCallback: Function;
+  viewSquareSize: number;
 
-  constructor(data: GridData = []) {
-    this.data = data;
+  constructor(params: GridContructorParams) {
+    this.data = params.data || [];
+    this.viewSquareSize = params.viewSquareSize;
     this.updateCallback = () => { };
   }
 
@@ -20,9 +26,11 @@ export class Grid {
     return [xSize, ySize];
   }
 
-  valueAt(xIndex: number, yIndex: number) {
+  valueAt(xIndex: number, yIndex: number): NullableNumber {
     const row = this.data[yIndex] || [];
-    return row[xIndex];
+    const value = row[xIndex];
+    if (value === undefined) return null;
+    return value;
   }
 
   set(xIndex: number, yIndex: number, value: number) {
@@ -37,16 +45,19 @@ export class Grid {
     }
   }
 
+  viewSquare(xStartIndex: number, yStartIndex: number) {
+    return range(this.viewSquareSize).map(yOffset => {
+      return range(this.viewSquareSize).map(xOffset => {
+        return this.valueAt(xStartIndex + xOffset, yStartIndex + yOffset);
+      })
+    });
+  }
+
 }
 
-export function useGrid(data?: GridData) {
-  const [grid] = useState(new Grid(data));
+export function useGrid(params: GridContructorParams) {
+  const [grid] = useState(new Grid(params));
   const [count, setCounter] = useState(0);
   grid.updateCallback = () => setCounter(count + 1);
   return grid;
-}
-
-export function randomGrid(x: number, y: number, max: number) {
-  const data = range(y).map(() => range(x).map(() => randomInt(max)));
-  return new Grid(data);
 }

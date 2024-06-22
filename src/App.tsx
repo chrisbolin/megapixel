@@ -4,9 +4,9 @@ import './App.css';
 
 import { Grid, NullableNumber, useGrid } from './Grid';
 
-function useAppState() {
+function useAppState({ viewSquareSize }: { viewSquareSize: number }) {
   const [currentColorIndex, setCurrentColorIndex] = useState(0);
-  const grid = useGrid();
+  const grid = useGrid({ viewSquareSize });
 
   return { currentColorIndex, setCurrentColorIndex, grid };
 }
@@ -19,7 +19,9 @@ function Box(
   { value, xIndex, yIndex, palette, pixelsPerBox }:
     { value: NullableNumber, yIndex: number, xIndex: number, palette: Palette, pixelsPerBox: number }
 ) {
-  const color = value !== null ? palette[value] : 'lightgrey'; // backup color
+  if (value === null) return null;
+
+  const color = palette[value];
   const oversizeDimension = pixelsPerBox + 1; // oversize the width and height to fill small gap in browser rendering
   return <rect
     width={oversizeDimension}
@@ -71,7 +73,7 @@ function BoxGrid(
     onTouchMove={handleTouchChange}
     onTouchStart={handleTouchChange}
   >
-    {state.grid.data.map((row, yIndex) => row.map((value, index) => <Box
+    {state.grid.viewSquare(0, 0).map((row, yIndex) => row.map((value, index) => <Box
       value={value}
       yIndex={yIndex}
       xIndex={index}
@@ -105,8 +107,8 @@ function ColorPicker({ state, palette }: { state: AppState, palette: Palette }) 
 }
 
 function App() {
-  const state = useAppState();
   const dimensionInBoxes = 8;
+  const state = useAppState({ viewSquareSize: dimensionInBoxes });
   const pixelsPerBox = 30;
   const widthInBoxes = dimensionInBoxes;
   const heightInBoxes = dimensionInBoxes;
