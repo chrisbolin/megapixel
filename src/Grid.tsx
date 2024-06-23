@@ -11,11 +11,17 @@ export type GridContructorParams = {
   viewportSize: number,
   palette: Palette,
   data?: GridData,
+  updatedAt?: number,
+  id?: string,
 };
 
 export type Palette = Array<string>;
 
 const COLOR_OUT_OF_BOUNDS = 'darkgrey';
+
+function makeGridId(): string {
+  return 'grid_' + new Date().toISOString().replace(/-|:|\.|Z/g,'').replace(/T/g, '_');
+}
 
 export class Grid {
   data: GridData;

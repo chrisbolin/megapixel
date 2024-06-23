@@ -116,6 +116,7 @@ function GridInfo({ grid }: { grid: Grid }) {
   const info = {
     size: grid.size,
     viewportCorner: grid.viewportCorner,
+    data: grid.data,
   };
   const infoString = JSON.stringify(info, null, 2);
   return <div>
