@@ -2,17 +2,27 @@ import React, { useState } from "react";
 import { range } from "./utils";
 
 export type NullableNumber = number | null;
-type GridData = Array<Array<NullableNumber>>;
+
+export type NullableString = string | null;
+
+export type GridData = Array<Array<NullableNumber>>;
+
 export type GridContructorParams = {
-  data?: GridData,
   viewportSize: number,
+  palette: Palette,
+  data?: GridData,
 };
+
+export type Palette = Array<string>;
+
+const COLOR_OUT_OF_BOUNDS = 'darkgrey';
 
 export class Grid {
   data: GridData;
   notify: Function;
   viewportSize: number;
   pageSize: number;
+  palette: Palette;
   viewportCorner: { x: number, y: number };
 
   constructor(params: GridContructorParams) {
@@ -21,6 +31,7 @@ export class Grid {
     this.pageSize = params.viewportSize - 1;
     this.notify = () => {};
     this.viewportCorner = { x: -1, y: -1 };
+    this.palette = params.palette;
   }
 
   get size(): [number, number] {
@@ -36,6 +47,13 @@ export class Grid {
     const value = row[xIndex];
     if (value === undefined) return null;
     return value;
+  }
+
+  colorAt(xIndex: number, yIndex: number): NullableString {
+    const value = this.valueAt(xIndex, yIndex);
+    if (value === null) return null;
+
+    return this.palette[value] || COLOR_OUT_OF_BOUNDS;
   }
 
   hasValue(xIndex: number, yIndex: number) {
@@ -73,7 +91,7 @@ export class Grid {
   visibleGrid() {
     return range(this.viewportSize).map(yOffset => {
       return range(this.viewportSize).map(xOffset => {
-        return this.valueAt(this.viewportCorner.x + xOffset, this.viewportCorner.y + yOffset);
+        return this.colorAt(this.viewportCorner.x + xOffset, this.viewportCorner.y + yOffset);
       })
     });
   }

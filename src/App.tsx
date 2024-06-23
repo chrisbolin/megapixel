@@ -2,13 +2,11 @@ import React, { useState } from 'react';
 
 import './App.css';
 
-import { Grid, NullableNumber, useGrid, GridInfo } from './Grid';
+import { Grid, useGrid, GridInfo, Palette, GridContructorParams, NullableString } from './Grid';
 
-const COLOR_OUT_OF_BOUNDS = 'darkgrey';
-
-function useAppState({ viewportSize }: { viewportSize: number }) {
+function useAppState(defaultGridParams: GridContructorParams) {
   const [colorIndex, setColorIndex] = useState(0);
-  const grid = useGrid({ viewportSize });
+  const grid = useGrid(defaultGridParams);
 
   return {
     colorIndex,
@@ -19,15 +17,12 @@ function useAppState({ viewportSize }: { viewportSize: number }) {
 
 type AppState = ReturnType<typeof useAppState>;
 
-type Palette = Array<string>;
-
 function Box(
-  { value, xIndex, yIndex, palette, pixelsPerBox }:
-    { value: NullableNumber, yIndex: number, xIndex: number, palette: Palette, pixelsPerBox: number }
+  { color, xIndex, yIndex, palette, pixelsPerBox }:
+    { color: NullableString, yIndex: number, xIndex: number, palette: Palette, pixelsPerBox: number }
 ) {
-  if (value === null) return null;
+  if (color === null) return null;
 
-  const color = palette[value] || COLOR_OUT_OF_BOUNDS;
   const oversizeDimension = pixelsPerBox + 1; // oversize the width and height to fill small gap in browser rendering
   return <rect
     width={oversizeDimension}
@@ -75,8 +70,8 @@ function BoxGrid(
     onTouchMove={handleTouchChange}
     onTouchStart={handleTouchChange}
   >
-    {state.grid.visibleGrid().map((row, yIndex) => row.map((value, index) => <Box
-      value={value}
+    {state.grid.visibleGrid().map((row, yIndex) => row.map((color, index) => <Box
+      color={color}
       yIndex={yIndex}
       xIndex={index}
       palette={palette}
@@ -118,12 +113,12 @@ function ViewportPicker({ state }: { state: AppState }) {
 }
 
 function App() {
-  const dimensionInBoxes = 9;
-  const state = useAppState({ viewportSize: dimensionInBoxes });
-  const pixelsPerBox = 30;
-  const widthInBoxes = dimensionInBoxes;
-  const heightInBoxes = dimensionInBoxes;
+  const viewportSize = 9;
   const palette = [ 'blue', 'red', 'yellow' ];
+  const state = useAppState({ viewportSize, palette });
+  const pixelsPerBox = 30;
+  const widthInBoxes = viewportSize;
+  const heightInBoxes = viewportSize;
   return (
     <div className="App">
       <BoxGrid
