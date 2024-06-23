@@ -11,7 +11,7 @@ export type GridContructorParams = {
   viewportSize: number,
   palette: Palette,
   data?: GridData,
-  updatedAt?: number,
+  createdAt?: number,
   id?: string,
 };
 
@@ -30,6 +30,9 @@ export class Grid {
   pageSize: number;
   palette: Palette;
   viewportCorner: { x: number, y: number };
+  id: string;
+  updatedAt: number;
+  createdAt: number;
 
   constructor(params: GridContructorParams) {
     this.data = params.data || [];
@@ -38,6 +41,9 @@ export class Grid {
     this.notify = () => {};
     this.viewportCorner = { x: -1, y: -1 };
     this.palette = params.palette;
+    this.id = params.id || makeGridId();
+    this.createdAt = params.createdAt || Date.now();
+    this.updatedAt = Date.now();
   }
 
   get size(): [number, number] {
@@ -75,7 +81,7 @@ export class Grid {
     return true;
   }
 
-  set(xIndex: number, yIndex: number, value: number) {
+  setValue(xIndex: number, yIndex: number, value: number) {
     const x = this.viewportCorner.x + xIndex;
     const y = this.viewportCorner.y + yIndex;
 
@@ -85,6 +91,8 @@ export class Grid {
 
     this.ensureRow(y);
     this.data[y][x] = value;
+
+    this.updatedAt = Date.now();
     this.notify();
   }
 

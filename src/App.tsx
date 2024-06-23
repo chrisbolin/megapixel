@@ -62,7 +62,7 @@ function BoxGrid(
 
   function handleTouchChange(event: React.TouchEvent<SVGElement>) {
     const { x, y } = getBoxFromEvent(state.grid, event);
-    state.grid.set(x, y, state.colorIndex);
+    state.grid.setValue(x, y, state.colorIndex);
   }
 
   return <svg
@@ -116,7 +116,7 @@ function GridInfo({ grid }: { grid: Grid }) {
   const info = {
     size: grid.size,
     viewportCorner: grid.viewportCorner,
-    data: grid.data,
+    id: grid.id,
   };
   const infoString = JSON.stringify(info, null, 2);
   return <div>

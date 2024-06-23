@@ -7,3 +7,11 @@ export function range(length: number) {
 export function randomInt(upperBoundExclusive: number) {
   return Math.floor(Math.random() * upperBoundExclusive);
 }
+
+export function removeDuplicates(array: Array<any>): Array<any> {
+  return Array.from(new Set(array));
+}
+
+export function addToSetArray(array: Array<any>, element: any) {
+  return removeDuplicates([element, ...array]);
+}
