@@ -5,10 +5,17 @@ import './App.css';
 import { Grid, NullableNumber, useGrid } from './Grid';
 
 function useAppState({ viewSquareSize }: { viewSquareSize: number }) {
-  const [currentColorIndex, setCurrentColorIndex] = useState(0);
+  const [colorIndex, setColorIndex] = useState(0);
+  const [viewportCorner, setViewportCorner] = useState([0, 0]);
   const grid = useGrid({ viewSquareSize });
 
-  return { currentColorIndex, setCurrentColorIndex, grid };
+  return {
+    colorIndex,
+    setColorIndex,
+    viewportCorner,
+    setViewportCorner,
+    grid,
+  };
 }
 
 type AppState = ReturnType<typeof useAppState>;
@@ -64,7 +71,7 @@ function BoxGrid(
 
     if (typeof value !== 'number') {
       // no value selected
-      state.grid.set(x, y, state.currentColorIndex);
+      state.grid.set(x, y, state.colorIndex);
     }
   }
 
@@ -73,7 +80,7 @@ function BoxGrid(
     onTouchMove={handleTouchChange}
     onTouchStart={handleTouchChange}
   >
-    {state.grid.viewSquare(0, 0).map((row, yIndex) => row.map((value, index) => <Box
+    {state.grid.viewSquare(state.viewportCorner[0], state.viewportCorner[1]).map((row, yIndex) => row.map((value, index) => <Box
       value={value}
       yIndex={yIndex}
       xIndex={index}
@@ -90,9 +97,9 @@ function ColorPicker({ state, palette }: { state: AppState, palette: Palette }) 
   const viewBox = `0 0 ${palette.length * dimensionInPixels} ${dimensionInPixels}`;
   return <svg viewBox={viewBox}>
     {palette.map((color, index) => {
-      const active = index === state.currentColorIndex;
+      const active = index === state.colorIndex;
       return <rect
-        onClick={() => state.setCurrentColorIndex(index)}
+        onClick={() => state.setColorIndex(index)}
         key={color}
         fill={color}
         width={dimensionInPixels}
@@ -104,6 +111,12 @@ function ColorPicker({ state, palette }: { state: AppState, palette: Palette }) 
     })
     }
   </svg>;
+}
+
+function ViewportPicker({ state }: { state: AppState }) {
+  const [x, y] = state.viewportCorner;
+  const handleClick = () => state.setViewportCorner([x + 1, y + 1]);
+  return <button onClick={handleClick}>Move Viewport</button>;
 }
 
 function App() {
@@ -123,7 +136,13 @@ function App() {
         pixelsPerBox={pixelsPerBox}
       />
       <ColorPicker state={state} palette={palette} />
-      {JSON.stringify(state.grid.size)}
+      <ViewportPicker state={state} />
+      <div>
+        viewportCorner: {JSON.stringify(state.viewportCorner)}
+      </div>
+      <div>
+        Grid.size: {JSON.stringify(state.grid.size)}
+      </div>
     </div>
   );
 }
