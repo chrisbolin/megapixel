@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { range } from "./utils";
 
 export type NullableNumber = number | null;
@@ -118,17 +118,4 @@ export function useGrid(params: GridContructorParams) {
   const [count, setCounter] = useState(0);
   grid.notify = () => setCounter(count + 1);
   return grid;
-}
-
-export function GridInfo({ grid }: { grid: Grid }) {
-  const info = {
-    size: grid.size,
-    viewportCorner: grid.viewportCorner,
-  };
-  const infoString = JSON.stringify(info, null, 2);
-  return <div>
-    <code style={{whiteSpace: 'pre-wrap'}}>
-      {infoString}
-    </code>
-  </div>;
 }

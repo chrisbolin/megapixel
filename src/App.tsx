@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import './App.css';
 
-import { Grid, useGrid, GridInfo, Palette, GridContructorParams, NullableString } from './Grid';
+import { Grid, useGrid, Palette, GridContructorParams, NullableString } from './Grid';
 
 function useAppState(defaultGridParams: GridContructorParams) {
   const [colorIndex, setColorIndex] = useState(0);
@@ -109,6 +109,19 @@ function ViewportPicker({ state }: { state: AppState }) {
     <button onClick={() => state.grid.moveViewportByPage(1, 0)}>{'>'}</button>
     <button onClick={() => state.grid.moveViewportByPage(0, -1)}>{'^'}</button>
     <button onClick={() => state.grid.moveViewportByPage(0, 1)}>{'v'}</button>
+  </div>;
+}
+
+function GridInfo({ grid }: { grid: Grid }) {
+  const info = {
+    size: grid.size,
+    viewportCorner: grid.viewportCorner,
+  };
+  const infoString = JSON.stringify(info, null, 2);
+  return <div>
+    <code style={{whiteSpace: 'pre-wrap'}}>
+      {infoString}
+    </code>
   </div>;
 }
 
