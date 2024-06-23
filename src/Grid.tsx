@@ -10,13 +10,15 @@ export type GridContructorParams = {
 
 export class Grid {
   data: GridData;
-  updateCallback: Function;
+  notify: Function;
   viewSquareSize: number;
+  viewportCorner: [number, number];
 
   constructor(params: GridContructorParams) {
     this.data = params.data || [];
     this.viewSquareSize = params.viewSquareSize;
-    this.updateCallback = () => { };
+    this.notify = () => {};
+    this.viewportCorner = [0, 0];
   }
 
   get size(): [number, number] {
@@ -36,7 +38,7 @@ export class Grid {
   set(xIndex: number, yIndex: number, value: number) {
     this.ensureRow(yIndex);
     this.data[yIndex][xIndex] = value;
-    this.updateCallback();
+    this.notify();
   }
 
   ensureRow(yIndex: number) {
@@ -45,12 +47,19 @@ export class Grid {
     }
   }
 
-  viewSquare(xStartIndex: number, yStartIndex: number) {
+  visibleGrid() {
+    const [x, y] = this.viewportCorner;
     return range(this.viewSquareSize).map(yOffset => {
       return range(this.viewSquareSize).map(xOffset => {
-        return this.valueAt(xStartIndex + xOffset, yStartIndex + yOffset);
+        return this.valueAt(x + xOffset, y + yOffset);
       })
     });
+  }
+
+  moveViewport() {
+    const [x, y] = this.viewportCorner;
+    this.viewportCorner = [x + 1, y + 1];
+    this.notify();
   }
 
 }
@@ -58,6 +67,6 @@ export class Grid {
 export function useGrid(params: GridContructorParams) {
   const [grid] = useState(new Grid(params));
   const [count, setCounter] = useState(0);
-  grid.updateCallback = () => setCounter(count + 1);
+  grid.notify = () => setCounter(count + 1);
   return grid;
 }

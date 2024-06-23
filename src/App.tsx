@@ -6,14 +6,11 @@ import { Grid, NullableNumber, useGrid } from './Grid';
 
 function useAppState({ viewSquareSize }: { viewSquareSize: number }) {
   const [colorIndex, setColorIndex] = useState(0);
-  const [viewportCorner, setViewportCorner] = useState([0, 0]);
   const grid = useGrid({ viewSquareSize });
 
   return {
     colorIndex,
     setColorIndex,
-    viewportCorner,
-    setViewportCorner,
     grid,
   };
 }
@@ -80,7 +77,7 @@ function BoxGrid(
     onTouchMove={handleTouchChange}
     onTouchStart={handleTouchChange}
   >
-    {state.grid.viewSquare(state.viewportCorner[0], state.viewportCorner[1]).map((row, yIndex) => row.map((value, index) => <Box
+    {state.grid.visibleGrid().map((row, yIndex) => row.map((value, index) => <Box
       value={value}
       yIndex={yIndex}
       xIndex={index}
@@ -114,9 +111,7 @@ function ColorPicker({ state, palette }: { state: AppState, palette: Palette }) 
 }
 
 function ViewportPicker({ state }: { state: AppState }) {
-  const [x, y] = state.viewportCorner;
-  const handleClick = () => state.setViewportCorner([x + 1, y + 1]);
-  return <button onClick={handleClick}>Move Viewport</button>;
+  return <button onClick={() => state.grid.moveViewport()}>Move Viewport</button>;
 }
 
 function App() {
@@ -138,7 +133,7 @@ function App() {
       <ColorPicker state={state} palette={palette} />
       <ViewportPicker state={state} />
       <div>
-        viewportCorner: {JSON.stringify(state.viewportCorner)}
+        viewportCorner: {JSON.stringify(state.grid.viewportCorner)}
       </div>
       <div>
         Grid.size: {JSON.stringify(state.grid.size)}
