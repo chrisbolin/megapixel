@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 
 import './App.css';
 
-import { Grid, NullableNumber, useGrid } from './Grid';
+import { Grid, NullableNumber, useGrid, GridInfo } from './Grid';
 
-function useAppState({ viewSquareSize }: { viewSquareSize: number }) {
+function useAppState({ viewportSize }: { viewportSize: number }) {
   const [colorIndex, setColorIndex] = useState(0);
-  const grid = useGrid({ viewSquareSize });
+  const grid = useGrid({ viewportSize });
 
   return {
     colorIndex,
@@ -59,17 +59,13 @@ function BoxGrid(
     }
     const x = Math.floor(clientX / measuredElement.clientWidth * widthInBoxes);
     const y = Math.floor(clientY / measuredElement.clientHeight * heightInBoxes);
-    const value = grid.valueAt(x, y);
-    return { x, y, value };
+
+    return { x, y };
   }
 
   function handleTouchChange(event: React.TouchEvent<SVGElement>) {
-    const { x, y, value } = getBoxFromEvent(state.grid, event);
-
-    if (typeof value !== 'number') {
-      // no value selected
-      state.grid.set(x, y, state.colorIndex);
-    }
+    const { x, y } = getBoxFromEvent(state.grid, event);
+    state.grid.set(x, y, state.colorIndex);
   }
 
   return <svg
@@ -116,7 +112,7 @@ function ViewportPicker({ state }: { state: AppState }) {
 
 function App() {
   const dimensionInBoxes = 8;
-  const state = useAppState({ viewSquareSize: dimensionInBoxes });
+  const state = useAppState({ viewportSize: dimensionInBoxes });
   const pixelsPerBox = 30;
   const widthInBoxes = dimensionInBoxes;
   const heightInBoxes = dimensionInBoxes;
@@ -132,12 +128,7 @@ function App() {
       />
       <ColorPicker state={state} palette={palette} />
       <ViewportPicker state={state} />
-      <div>
-        viewportCorner: {JSON.stringify(state.grid.viewportCorner)}
-      </div>
-      <div>
-        Grid.size: {JSON.stringify(state.grid.size)}
-      </div>
+      <GridInfo grid={state.grid} />
     </div>
   );
 }

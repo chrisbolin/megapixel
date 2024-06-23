@@ -1,30 +1,30 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { range } from "./utils";
 
 export type NullableNumber = number | null;
 type GridData = Array<Array<NullableNumber>>;
 export type GridContructorParams = {
   data?: GridData,
-  viewSquareSize: number,
+  viewportSize: number,
 };
 
 export class Grid {
   data: GridData;
   notify: Function;
-  viewSquareSize: number;
-  viewportCorner: [number, number];
+  viewportSize: number;
+  viewportCorner: { x: number, y: number };
 
   constructor(params: GridContructorParams) {
     this.data = params.data || [];
-    this.viewSquareSize = params.viewSquareSize;
+    this.viewportSize = params.viewportSize;
     this.notify = () => {};
-    this.viewportCorner = [0, 0];
+    this.viewportCorner = { x: 0, y: 0 };
   }
 
   get size(): [number, number] {
     const ySize = this.data.length;
     const rowLengths = this.data.map(row => row.length).filter(Boolean);
-    const xSize = Math.max(...rowLengths);
+    const xSize = Math.max(...rowLengths, 0);
     return [xSize, ySize];
   }
 
@@ -35,9 +35,19 @@ export class Grid {
     return value;
   }
 
+  hasValue(xIndex: number, yIndex: number) {
+    const value = this.valueAt(xIndex, yIndex);
+    return value !== null;
+  }
+
   set(xIndex: number, yIndex: number, value: number) {
-    this.ensureRow(yIndex);
-    this.data[yIndex][xIndex] = value;
+    const x = this.viewportCorner.x + xIndex;
+    const y = this.viewportCorner.y + yIndex;
+
+    if (this.hasValue(x, y)) return; // don't overwrite
+
+    this.ensureRow(y);
+    this.data[y][x] = value;
     this.notify();
   }
 
@@ -48,17 +58,15 @@ export class Grid {
   }
 
   visibleGrid() {
-    const [x, y] = this.viewportCorner;
-    return range(this.viewSquareSize).map(yOffset => {
-      return range(this.viewSquareSize).map(xOffset => {
-        return this.valueAt(x + xOffset, y + yOffset);
+    return range(this.viewportSize).map(yOffset => {
+      return range(this.viewportSize).map(xOffset => {
+        return this.valueAt(this.viewportCorner.x + xOffset, this.viewportCorner.y + yOffset);
       })
     });
   }
 
   moveViewport() {
-    const [x, y] = this.viewportCorner;
-    this.viewportCorner = [x + 1, y + 1];
+    this.viewportCorner = { x: this.viewportCorner.x + 4 , y: this.viewportCorner.y + 0 };
     this.notify();
   }
 
@@ -69,4 +77,16 @@ export function useGrid(params: GridContructorParams) {
   const [count, setCounter] = useState(0);
   grid.notify = () => setCounter(count + 1);
   return grid;
+}
+
+export function GridInfo({ grid }: { grid: Grid }) {
+  const info = {
+    size: grid.size
+  };
+  const infoString = JSON.stringify(info, null, 2);
+  return <div>
+    <code style={{whiteSpace: 'pre-wrap'}}>
+      {infoString}
+    </code>
+  </div>;
 }
