@@ -111,12 +111,12 @@ function ViewportPicker({ state }: { state: AppState }) {
 }
 
 function App() {
-  const dimensionInBoxes = 8;
+  const dimensionInBoxes = 9;
   const state = useAppState({ viewportSize: dimensionInBoxes });
   const pixelsPerBox = 30;
   const widthInBoxes = dimensionInBoxes;
   const heightInBoxes = dimensionInBoxes;
-  const palette = ['yellow', 'blue', 'red'];
+  const palette = [ 'blue', 'red', 'yellow' ];
   return (
     <div className="App">
       <BoxGrid

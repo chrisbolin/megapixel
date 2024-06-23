@@ -40,11 +40,20 @@ export class Grid {
     return value !== null;
   }
 
+  inViewport(xIndex: number, yIndex: number) {
+    if (xIndex < this.viewportCorner.x) return false;
+    if (yIndex < this.viewportCorner.y) return false;
+    if (xIndex >= this.viewportCorner.x + this.viewportSize) return false;
+    if (yIndex >= this.viewportCorner.y + this.viewportSize) return false;
+    return true;
+  }
+
   set(xIndex: number, yIndex: number, value: number) {
     const x = this.viewportCorner.x + xIndex;
     const y = this.viewportCorner.y + yIndex;
 
     if (this.hasValue(x, y)) return; // don't overwrite
+    if (!this.inViewport(x, y)) return;
 
     this.ensureRow(y);
     this.data[y][x] = value;
