@@ -4,6 +4,8 @@ import './App.css';
 
 import { Grid, NullableNumber, useGrid, GridInfo } from './Grid';
 
+const COLOR_OUT_OF_BOUNDS = 'darkgrey';
+
 function useAppState({ viewportSize }: { viewportSize: number }) {
   const [colorIndex, setColorIndex] = useState(0);
   const grid = useGrid({ viewportSize });
@@ -25,7 +27,7 @@ function Box(
 ) {
   if (value === null) return null;
 
-  const color = palette[value];
+  const color = palette[value] || COLOR_OUT_OF_BOUNDS;
   const oversizeDimension = pixelsPerBox + 1; // oversize the width and height to fill small gap in browser rendering
   return <rect
     width={oversizeDimension}

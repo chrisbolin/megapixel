@@ -20,7 +20,7 @@ export class Grid {
     this.viewportSize = params.viewportSize;
     this.pageSize = params.viewportSize - 1;
     this.notify = () => {};
-    this.viewportCorner = { x: 0, y: 0 };
+    this.viewportCorner = { x: -1, y: -1 };
   }
 
   get size(): [number, number] {
@@ -31,6 +31,7 @@ export class Grid {
   }
 
   valueAt(xIndex: number, yIndex: number): NullableNumber {
+    if (xIndex < 0 || yIndex < 0) return -1;
     const row = this.data[yIndex] || [];
     const value = row[xIndex];
     if (value === undefined) return null;
@@ -55,7 +56,8 @@ export class Grid {
     const y = this.viewportCorner.y + yIndex;
 
     if (this.hasValue(x, y)) return; // don't overwrite
-    if (!this.inViewport(x, y)) return;
+    if (!this.inViewport(x, y)) return; // don't draw outside the viewport
+    if (x < 0 || y < 0) return; // don't draw on negative indexes
 
     this.ensureRow(y);
     this.data[y][x] = value;
@@ -79,7 +81,7 @@ export class Grid {
   moveViewport(xDelta: number, yDelta: number) {
     const xIndex = this.viewportCorner.x + xDelta;
     const yIndex = this.viewportCorner.y + yDelta;
-    if (xIndex < 0 || yIndex < 0) return; // don't allow negative indexes
+    if (xIndex < -1 || yIndex < -1) return; // don't allow negative indexes
 
     this.viewportCorner = {
       x: xIndex,
