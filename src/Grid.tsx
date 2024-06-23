@@ -12,11 +12,13 @@ export class Grid {
   data: GridData;
   notify: Function;
   viewportSize: number;
+  pageSize: number;
   viewportCorner: { x: number, y: number };
 
   constructor(params: GridContructorParams) {
     this.data = params.data || [];
     this.viewportSize = params.viewportSize;
+    this.pageSize = params.viewportSize - 1;
     this.notify = () => {};
     this.viewportCorner = { x: 0, y: 0 };
   }
@@ -74,11 +76,21 @@ export class Grid {
     });
   }
 
-  moveViewport() {
-    this.viewportCorner = { x: this.viewportCorner.x + 4 , y: this.viewportCorner.y + 0 };
+  moveViewport(xDelta: number, yDelta: number) {
+    const xIndex = this.viewportCorner.x + xDelta;
+    const yIndex = this.viewportCorner.y + yDelta;
+    if (xIndex < 0 || yIndex < 0) return; // don't allow negative indexes
+
+    this.viewportCorner = {
+      x: xIndex,
+      y: yIndex
+    };
     this.notify();
   }
 
+  moveViewportByPage(xPages: number, yPages: number) {
+    this.moveViewport(xPages * this.pageSize, yPages * this.pageSize);
+  }
 }
 
 export function useGrid(params: GridContructorParams) {
@@ -90,7 +102,8 @@ export function useGrid(params: GridContructorParams) {
 
 export function GridInfo({ grid }: { grid: Grid }) {
   const info = {
-    size: grid.size
+    size: grid.size,
+    viewportCorner: grid.viewportCorner,
   };
   const infoString = JSON.stringify(info, null, 2);
   return <div>
