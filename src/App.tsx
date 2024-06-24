@@ -6,7 +6,8 @@ import { Grid, useGrid, Palette, GridContructorParams, NullableString } from './
 
 function useAppState(defaultGridParams: GridContructorParams) {
   const [colorIndex, setColorIndex] = useState(0);
-  const grid = useGrid(defaultGridParams);
+  const gridForState = new Grid(defaultGridParams);
+  const grid = useGrid(gridForState);
 
   return {
     colorIndex,
@@ -117,6 +118,7 @@ function GridInfo({ grid }: { grid: Grid }) {
     size: grid.size,
     viewportCorner: grid.viewportCorner,
     id: grid.id,
+    updatedAt: grid.updatedAt,
   };
   const infoString = JSON.stringify(info, null, 2);
   return <div>

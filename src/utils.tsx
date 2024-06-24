@@ -1,3 +1,5 @@
+const DEBUG = false;
+
 export function range(length: number) {
   return new Array(length)
     .fill(0)
@@ -14,4 +16,10 @@ export function removeDuplicates(array: Array<any>): Array<any> {
 
 export function addToSetArray(array: Array<any>, element: any) {
   return removeDuplicates([element, ...array]);
+}
+
+export function log(...things: any[]) {
+  if (DEBUG) {
+    console.log(...things);
+  }
 }

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { range } from "./utils";
+import { range, addToSetArray, log, sortBy } from "./utils";
 
 export type NullableNumber = number | null;
 
@@ -12,10 +12,17 @@ export type GridContructorParams = {
   palette: Palette,
   data?: GridData,
   createdAt?: number,
+  updatedAt?: number,
   id?: string,
 };
 
 export type Palette = Array<string>;
+
+const STORAGE_KEYS = {
+  ALL_GRID_IDS: 'grids',
+  SUFFIX_GRID_METADATA: '',
+  SUFFIX_GRID_DATA: '_data',
+};
 
 const COLOR_OUT_OF_BOUNDS = 'darkgrey';
 
@@ -44,6 +51,16 @@ export class Grid {
     this.id = params.id || makeGridId();
     this.createdAt = params.createdAt || Date.now();
     this.updatedAt = Date.now();
+  }
+
+  get metadata(): GridContructorParams {
+    // persisted metadata; everything in constructor except data
+    return {
+      viewportSize: this.viewportSize,
+      palette: this.palette,
+      createdAt: this.createdAt,
+      id: this.id,
+    };
   }
 
   get size(): [number, number] {
@@ -93,6 +110,7 @@ export class Grid {
     this.data[y][x] = value;
 
     this.updatedAt = Date.now();
+    saveGrid(this);
     this.notify();
   }
 
@@ -127,9 +145,38 @@ export class Grid {
   }
 }
 
-export function useGrid(params: GridContructorParams) {
-  const [grid] = useState(new Grid(params));
+export function useGrid(grid: Grid) {
+  const [gridInState] = useState(grid);
   const [count, setCounter] = useState(0);
-  grid.notify = () => setCounter(count + 1);
-  return grid;
+  gridInState.notify = () => setCounter(count + 1);
+  return gridInState;
+}
+
+ function listSavedGridIds(): Array<string> {
+  const json = localStorage.getItem(STORAGE_KEYS.ALL_GRID_IDS) || '[]';
+  return JSON.parse(json);
+}
+
+function saveGrid(grid: Grid) {
+  const gridIds = listSavedGridIds();
+  log('listSavedGridIds', gridIds);
+  localStorage.setItem(grid.id + STORAGE_KEYS.SUFFIX_GRID_METADATA, JSON.stringify(grid.metadata));
+  localStorage.setItem(grid.id + STORAGE_KEYS.SUFFIX_GRID_DATA, JSON.stringify(grid.data));
+  localStorage.setItem(STORAGE_KEYS.ALL_GRID_IDS, JSON.stringify(addToSetArray(gridIds, grid.id)));
+}
+
+function loadGridMetadata(gridId: string): GridContructorParams | null {
+  const json = localStorage.getItem(gridId + STORAGE_KEYS.SUFFIX_GRID_METADATA);
+  if (!json) return null;
+  return JSON.parse(json);
+}
+
+export function loadMostRecentGrid(): Grid | null {
+  const grids = listSavedGridIds().map(loadGridMetadata).sort((a, b) => {
+    if (!a?.updatedAt) return -1;
+    if (!b?.updatedAt) return 1;
+    return a.updatedAt - b.updatedAt;
+  });
+  if (grids.length === 0) return null;
+  
 }
