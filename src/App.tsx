@@ -106,11 +106,11 @@ function ColorPicker({ state, palette }: { state: AppState, palette: Palette }) 
 }
 
 function ViewportPicker({ state }: { state: AppState }) {
-  return <div>
-    <button onClick={() => state.grid.moveViewportByPage(-1, 0)}>{'<'}</button>
-    <button onClick={() => state.grid.moveViewportByPage(1, 0)}>{'>'}</button>
-    <button onClick={() => state.grid.moveViewportByPage(0, -1)}>{'^'}</button>
-    <button onClick={() => state.grid.moveViewportByPage(0, 1)}>{'v'}</button>
+  return <div className="ViewportPicker">
+    <button onClick={() => state.grid.moveViewportByPage(-1, 0)}>{'< back'}</button>
+    <button onClick={() => state.grid.moveViewportByPage(1, 0)}>{'next >'}</button>
+    <button onClick={() => state.grid.moveViewportByPage(0, -1)}>{'^ up'}</button>
+    <button onClick={() => state.grid.moveViewportByPage(0, 1)}>{'v down'}</button>
   </div>;
 }
 
