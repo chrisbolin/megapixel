@@ -45,7 +45,7 @@ export class Grid {
   };
 
   constructor(params: GridContructorParams) {
-    this.data = params.data || [];
+    this.data = params.data?.map(row => row || []) || [];
     this.viewportSize = params.viewportSize;
     this.pageSize = params.viewportSize - 1;
     this.notify = () => { };
