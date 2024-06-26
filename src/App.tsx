@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import './App.css';
 
 import { Grid, useGrid, Palette, GridContructorParams, NullableString, loadMostRecentGrid } from './Grid';
+import { roundTo } from './utils';
 
 function useAppState(defaultGridParams: GridContructorParams) {
   const [colorIndex, setColorIndex] = useState(0);
@@ -115,10 +116,7 @@ function ViewportPicker({ state }: { state: AppState }) {
 
 function GridInfo({ grid }: { grid: Grid }) {
   const info = {
-    id: grid.id,
-    createdAt: grid.createdAt,
-    updatedAt: grid.updatedAt,
-    lastSaveTimeMS: grid.metrics.lastSaveTimeMS,
+    lastSaveTimeMS: roundTo(grid.metrics.lastSaveTimeMS, 0.01),
   };
   const infoString = JSON.stringify(info, null, 2);
   return <div>

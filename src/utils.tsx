@@ -23,3 +23,7 @@ export function log(...things: any[]) {
     console.log(...things);
   }
 }
+
+export function roundTo(value: number, place: number = 1) {
+  return Math.round(value / place) * place;
+}
