@@ -114,9 +114,10 @@ function ViewportPicker({ state }: { state: AppState }) {
   </div>;
 }
 
-function GridInfo({ grid }: { grid: Grid }) {
+function DebugInfo({ grid }: { grid: Grid }) {
   const info = {
     lastSaveTimeMS: roundTo(grid.metrics.lastSaveTimeMS, 0.01),
+    size: grid.size,
   };
   const infoString = JSON.stringify(info, null, 2);
   return <div>
@@ -144,7 +145,7 @@ function App() {
       />
       <ColorPicker state={state} palette={palette} />
       <ViewportPicker state={state} />
-      <GridInfo grid={state.grid} />
+      <DebugInfo grid={state.grid} />
     </div>
   );
 }
