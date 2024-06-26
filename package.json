@@ -23,7 +23,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "export": "mkdir -p docs/; rm -rf docs/; mv build/ docs/"
+    "publish": "./scripts/publish.sh"
   },
   "eslintConfig": {
     "extends": [
