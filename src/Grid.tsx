@@ -127,7 +127,7 @@ export class Grid {
   };
 
   ensureRow(yIndex: number) {
-    if (this.data[yIndex] === undefined) {
+    if (!this.data[yIndex]) {
       this.data[yIndex] = [];
     }
   }
