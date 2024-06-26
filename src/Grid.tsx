@@ -196,7 +196,7 @@ export function loadMostRecentGrid(): Grid | null {
     return a.updatedAt - b.updatedAt;
   });
   const metadata = metadatas[0];
-  if (metadata === null || metadata.id === undefined) return null;
+  if (!metadata || metadata.id === undefined) return null;
 
   const data = loadGridData(metadata.id);
   if (data === null) return null;
