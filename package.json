@@ -1,6 +1,7 @@
 {
   "name": "megapixel",
   "version": "0.1.0",
+  "homepage": "https://chrisbolin.co/megapixel/",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
@@ -21,7 +22,8 @@
     "ngrok": "ngrok http http://localhost:3000",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "export": "mkdir -p docs/; rm -rf docs/; mv build/ docs/"
   },
   "eslintConfig": {
     "extends": [
