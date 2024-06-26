@@ -115,10 +115,10 @@ function ViewportPicker({ state }: { state: AppState }) {
 
 function GridInfo({ grid }: { grid: Grid }) {
   const info = {
-    size: grid.size,
-    viewportCorner: grid.viewportCorner,
     id: grid.id,
+    createdAt: grid.createdAt,
     updatedAt: grid.updatedAt,
+    lastSaveTimeMS: grid.metrics.lastSaveTimeMS,
   };
   const infoString = JSON.stringify(info, null, 2);
   return <div>

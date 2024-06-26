@@ -40,6 +40,9 @@ export class Grid {
   id: string;
   updatedAt: number;
   createdAt: number;
+  metrics: {
+    lastSaveTimeMS: number;
+  };
 
   constructor(params: GridContructorParams) {
     this.data = params.data || [];
@@ -51,6 +54,9 @@ export class Grid {
     this.id = params.id || makeGridId();
     this.createdAt = params.createdAt || Date.now();
     this.updatedAt = Date.now();
+    this.metrics = {
+      lastSaveTimeMS: 0,
+    };
   }
 
   get metadata(): GridContructorParams {
@@ -110,9 +116,15 @@ export class Grid {
     this.data[y][x] = value;
 
     this.updatedAt = Date.now();
-    saveGrid(this);
+    this.save();
     this.notify();
   }
+
+  save() {
+    const t0 = performance.now();
+    saveGrid(this);
+    this.metrics.lastSaveTimeMS = performance.now() - t0;
+  };
 
   ensureRow(yIndex: number) {
     if (this.data[yIndex] === undefined) {
