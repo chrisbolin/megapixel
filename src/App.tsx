@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 
 import './App.css';
 
-import { Grid, useGrid, Palette, GridContructorParams, NullableString } from './Grid';
+import { Grid, useGrid, Palette, GridContructorParams, NullableString, loadMostRecentGrid } from './Grid';
 
 function useAppState(defaultGridParams: GridContructorParams) {
   const [colorIndex, setColorIndex] = useState(0);
-  const gridForState = new Grid(defaultGridParams);
+  const gridForState = loadMostRecentGrid() || new Grid(defaultGridParams);
   const grid = useGrid(gridForState);
 
   return {
@@ -122,7 +122,7 @@ function GridInfo({ grid }: { grid: Grid }) {
   };
   const infoString = JSON.stringify(info, null, 2);
   return <div>
-    <code style={{whiteSpace: 'pre-wrap'}}>
+    <code style={{ whiteSpace: 'pre-wrap' }}>
       {infoString}
     </code>
   </div>;
@@ -130,7 +130,7 @@ function GridInfo({ grid }: { grid: Grid }) {
 
 function App() {
   const viewportSize = 9;
-  const palette = [ 'blue', 'red', 'yellow' ];
+  const palette = ['blue', 'red', 'yellow'];
   const state = useAppState({ viewportSize, palette });
   const pixelsPerBox = 30;
   const widthInBoxes = viewportSize;

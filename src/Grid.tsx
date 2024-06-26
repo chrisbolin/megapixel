@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { range, addToSetArray, log, sortBy } from "./utils";
+import { range, addToSetArray, log } from "./utils";
 
 export type NullableNumber = number | null;
 
@@ -27,7 +27,7 @@ const STORAGE_KEYS = {
 const COLOR_OUT_OF_BOUNDS = 'darkgrey';
 
 function makeGridId(): string {
-  return 'grid_' + new Date().toISOString().replace(/-|:|\.|Z/g,'').replace(/T/g, '_');
+  return 'grid_' + new Date().toISOString().replace(/-|:|\.|Z/g, '').replace(/T/g, '_');
 }
 
 export class Grid {
@@ -45,7 +45,7 @@ export class Grid {
     this.data = params.data || [];
     this.viewportSize = params.viewportSize;
     this.pageSize = params.viewportSize - 1;
-    this.notify = () => {};
+    this.notify = () => { };
     this.viewportCorner = { x: -1, y: -1 };
     this.palette = params.palette;
     this.id = params.id || makeGridId();
@@ -152,7 +152,7 @@ export function useGrid(grid: Grid) {
   return gridInState;
 }
 
- function listSavedGridIds(): Array<string> {
+function listSavedGridIds(): Array<string> {
   const json = localStorage.getItem(STORAGE_KEYS.ALL_GRID_IDS) || '[]';
   return JSON.parse(json);
 }
@@ -171,12 +171,23 @@ function loadGridMetadata(gridId: string): GridContructorParams | null {
   return JSON.parse(json);
 }
 
+function loadGridData(gridId: string): GridData | null {
+  const json = localStorage.getItem(gridId + STORAGE_KEYS.SUFFIX_GRID_DATA);
+  if (!json) return null;
+  return JSON.parse(json);
+}
+
 export function loadMostRecentGrid(): Grid | null {
-  const grids = listSavedGridIds().map(loadGridMetadata).sort((a, b) => {
+  const metadatas = listSavedGridIds().map(loadGridMetadata).sort((a, b) => {
     if (!a?.updatedAt) return -1;
     if (!b?.updatedAt) return 1;
     return a.updatedAt - b.updatedAt;
   });
-  if (grids.length === 0) return null;
-  
+  const metadata = metadatas[0];
+  if (metadata === null || metadata.id === undefined) return null;
+
+  const data = loadGridData(metadata.id);
+  if (data === null) return null;
+
+  return new Grid({ ...metadata, data });
 }
