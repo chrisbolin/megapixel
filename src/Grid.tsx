@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { range, addToSetArray, log } from "./utils";
+import { range, addToSetArray } from "./utils";
 
 export type NullableNumber = number | null;
 
@@ -14,6 +14,7 @@ export type GridContructorParams = {
   createdAt?: number,
   updatedAt?: number,
   id?: string,
+  viewportCorner?: { x: number, y: number },
 };
 
 export type Palette = Array<string>;
@@ -49,7 +50,7 @@ export class Grid {
     this.viewportSize = params.viewportSize;
     this.pageSize = params.viewportSize - 1;
     this.notify = () => { };
-    this.viewportCorner = { x: -1, y: -1 };
+    this.viewportCorner = params.viewportCorner || { x: -1, y: -1 };
     this.palette = params.palette;
     this.id = params.id || makeGridId();
     this.createdAt = params.createdAt || Date.now();
@@ -65,6 +66,7 @@ export class Grid {
       viewportSize: this.viewportSize,
       palette: this.palette,
       createdAt: this.createdAt,
+      viewportCorner: this.viewportCorner,
       id: this.id,
     };
   }
@@ -117,13 +119,13 @@ export class Grid {
 
     this.updatedAt = Date.now();
     this.save();
-    this.notify();
   }
 
   save() {
     const t0 = performance.now();
     saveGrid(this);
     this.metrics.lastSaveTimeMS = performance.now() - t0;
+    this.notify();
   };
 
   ensureRow(yIndex: number) {
@@ -149,7 +151,7 @@ export class Grid {
       x: xIndex,
       y: yIndex
     };
-    this.notify();
+    this.save();
   }
 
   moveViewportByPage(xPages: number, yPages: number) {
@@ -171,7 +173,7 @@ function listSavedGridIds(): Array<string> {
 
 function saveGrid(grid: Grid) {
   const gridIds = listSavedGridIds();
-  log('listSavedGridIds', gridIds);
+  console.log(grid.metadata);
   localStorage.setItem(grid.id + STORAGE_KEYS.SUFFIX_GRID_METADATA, JSON.stringify(grid.metadata));
   localStorage.setItem(grid.id + STORAGE_KEYS.SUFFIX_GRID_DATA, JSON.stringify(grid.data));
   localStorage.setItem(STORAGE_KEYS.ALL_GRID_IDS, JSON.stringify(addToSetArray(gridIds, grid.id)));
