@@ -60,14 +60,16 @@ export class Grid {
     };
   }
 
-  get metadata(): GridContructorParams {
-    // persisted metadata; everything in constructor except data
+  get coreData(): GridContructorParams {
+    // everything needed to revive the Grid
     return {
+      id: this.id,
+      data: this.data,
       viewportSize: this.viewportSize,
       palette: this.palette,
       createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
       viewportCorner: this.viewportCorner,
-      id: this.id,
     };
   }
 
@@ -121,6 +123,10 @@ export class Grid {
     this.save();
   }
 
+  toJSON() {
+    return JSON.stringify(this.coreData);
+  }
+
   save() {
     const t0 = performance.now();
     saveGrid(this);
@@ -159,11 +165,25 @@ export class Grid {
   }
 }
 
-export function useGrid(grid: Grid) {
-  const [gridInState] = useState(grid);
+export function useGrid(grid: Grid): [Grid, (newGrid: Grid) => void] {
+  const [gridInState, _setGridInState] = useState(grid);
   const [count, setCounter] = useState(0);
   gridInState.notify = () => setCounter(count + 1);
-  return gridInState;
+
+  function setGridInState(newGrid: Grid) {
+    newGrid.notify = () => setCounter(count + 1);
+    _setGridInState(newGrid);
+    newGrid.save();
+  }
+  return [gridInState, setGridInState];
+}
+
+export function newGridFromJSON(json: string): Grid | null {
+  try {
+    return new Grid(JSON.parse(json));
+  } catch (error) {
+    return null;
+  }
 }
 
 function listSavedGridIds(): Array<string> {
@@ -173,8 +193,7 @@ function listSavedGridIds(): Array<string> {
 
 function saveGrid(grid: Grid) {
   const gridIds = listSavedGridIds();
-  console.log(grid.metadata);
-  localStorage.setItem(grid.id + STORAGE_KEYS.SUFFIX_GRID_METADATA, JSON.stringify(grid.metadata));
+  localStorage.setItem(grid.id + STORAGE_KEYS.SUFFIX_GRID_METADATA, JSON.stringify(grid.coreData));
   localStorage.setItem(grid.id + STORAGE_KEYS.SUFFIX_GRID_DATA, JSON.stringify(grid.data));
   localStorage.setItem(STORAGE_KEYS.ALL_GRID_IDS, JSON.stringify(addToSetArray(gridIds, grid.id)));
 }
@@ -193,9 +212,9 @@ function loadGridData(gridId: string): GridData | null {
 
 export function loadMostRecentGrid(): Grid | null {
   const metadatas = listSavedGridIds().map(loadGridMetadata).sort((a, b) => {
-    if (!a?.updatedAt) return -1;
-    if (!b?.updatedAt) return 1;
-    return a.updatedAt - b.updatedAt;
+    if (!a?.updatedAt) return 1;
+    if (!b?.updatedAt) return -1;
+    return b.updatedAt - a.updatedAt;
   });
   const metadata = metadatas[0];
   if (!metadata || metadata.id === undefined) return null;

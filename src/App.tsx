@@ -2,20 +2,20 @@ import React, { useState } from 'react';
 
 import './App.css';
 
-import { Grid, useGrid, Palette, GridContructorParams, NullableString, loadMostRecentGrid } from './Grid';
-import { roundTo } from './utils';
-import { MenuButton } from './Menu';
+import { Grid, useGrid, Palette, GridContructorParams, NullableString, loadMostRecentGrid, newGridFromJSON } from './Grid';
+import { copyTextToClipboard, getTextFromClipboard, roundTo } from './utils';
 
 function useAppState(defaultGridParams: GridContructorParams) {
   const [colorIndex, setColorIndex] = useState(0);
   const [view, setView] = useState('canvas');
   const gridForState = loadMostRecentGrid() || new Grid(defaultGridParams);
-  const grid = useGrid(gridForState);
+  const [grid, setGrid] = useGrid(gridForState);
 
   return {
     colorIndex,
     setColorIndex,
     grid,
+    setGrid,
     view,
     setView,
   };
@@ -147,8 +147,15 @@ function App() {
       />
       <ColorPicker state={state} palette={palette} />
       <ViewportPicker state={state} />
+      <button onClick={() => copyTextToClipboard(state.grid.toJSON())}>copy grid to clipboard</button>
+      <button onClick={async () => {
+        const json = await getTextFromClipboard();
+        const newGrid = newGridFromJSON(json);
+        if (newGrid) {
+          state.setGrid(newGrid);
+        }
+      }}>open grid from clipboard</button>
       <DebugInfo grid={state.grid} />
-      <MenuButton />
     </div>
   );
 }

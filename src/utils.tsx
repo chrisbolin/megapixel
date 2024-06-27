@@ -19,3 +19,11 @@ export function addToSetArray(array: Array<any>, element: any) {
 export function roundTo(value: number, place: number = 1) {
   return Math.round(value / place) * place;
 }
+
+export async function copyTextToClipboard(text: string) {
+  return await navigator.clipboard.writeText(text);
+}
+
+export async function getTextFromClipboard() {
+  return await navigator.clipboard.readText();
+}
