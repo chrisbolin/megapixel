@@ -4,9 +4,11 @@ import './App.css';
 
 import { Grid, useGrid, Palette, GridContructorParams, NullableString, loadMostRecentGrid } from './Grid';
 import { roundTo } from './utils';
+import { MenuButton } from './Menu';
 
 function useAppState(defaultGridParams: GridContructorParams) {
   const [colorIndex, setColorIndex] = useState(0);
+  const [view, setView] = useState('canvas');
   const gridForState = loadMostRecentGrid() || new Grid(defaultGridParams);
   const grid = useGrid(gridForState);
 
@@ -14,6 +16,8 @@ function useAppState(defaultGridParams: GridContructorParams) {
     colorIndex,
     setColorIndex,
     grid,
+    view,
+    setView,
   };
 }
 
@@ -144,6 +148,7 @@ function App() {
       <ColorPicker state={state} palette={palette} />
       <ViewportPicker state={state} />
       <DebugInfo grid={state.grid} />
+      <MenuButton />
     </div>
   );
 }

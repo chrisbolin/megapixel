@@ -2,3 +2,8 @@
   min-width: 25%;
   min-height: 2em;
 }
+
+.MenuButton {
+  position: absolute;
+  bottom: 0;
+}
