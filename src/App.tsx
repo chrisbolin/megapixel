@@ -20,8 +20,8 @@ function useAppState(defaultGridParams: GridContructorParams) {
 type AppState = ReturnType<typeof useAppState>;
 
 function Box(
-  { color, xIndex, yIndex, palette, pixelsPerBox }:
-    { color: NullableString, yIndex: number, xIndex: number, palette: Palette, pixelsPerBox: number }
+  { color, xIndex, yIndex, pixelsPerBox }:
+    { color: NullableString, yIndex: number, xIndex: number, pixelsPerBox: number }
 ) {
   if (color === null) return null;
 
@@ -35,13 +35,13 @@ function Box(
   />;
 }
 
-function BoxGrid(
-  { state, widthInBoxes, heightInBoxes, palette, pixelsPerBox }:
-    { state: AppState, widthInBoxes: number, heightInBoxes: number, palette: Palette, pixelsPerBox: number }
+function GridCanvas(
+  { state, widthInBoxes, heightInBoxes, pixelsPerBox }:
+    { state: AppState, widthInBoxes: number, heightInBoxes: number, pixelsPerBox: number }
 ) {
   const viewBox = `0 0 ${widthInBoxes * pixelsPerBox} ${heightInBoxes * pixelsPerBox}`;
 
-  function getBoxFromEvent(grid: Grid, event: React.TouchEvent<SVGElement>) {
+  function getBoxFromEvent(event: React.TouchEvent<SVGElement>) {
     const { clientX, clientY, target } = event.touches[0];
 
     if (!(target instanceof Element && target.nodeName && target.parentElement)) {
@@ -63,7 +63,7 @@ function BoxGrid(
   }
 
   function handleTouchChange(event: React.TouchEvent<SVGElement>) {
-    const { x, y } = getBoxFromEvent(state.grid, event);
+    const { x, y } = getBoxFromEvent(event);
     state.grid.setValue(x, y, state.colorIndex);
   }
 
@@ -76,7 +76,6 @@ function BoxGrid(
       color={color}
       yIndex={yIndex}
       xIndex={index}
-      palette={palette}
       pixelsPerBox={pixelsPerBox}
       key={index}
     />))
@@ -136,11 +135,10 @@ function App() {
   const heightInBoxes = viewportSize;
   return (
     <div className="App">
-      <BoxGrid
+      <GridCanvas
         widthInBoxes={widthInBoxes}
         heightInBoxes={heightInBoxes}
         state={state}
-        palette={palette}
         pixelsPerBox={pixelsPerBox}
       />
       <ColorPicker state={state} palette={palette} />
