@@ -130,7 +130,7 @@ function DPad({ state }: { state: AppState }) {
 function DebugInfo({ grid }: { grid: Grid }) {
   const info = {
     lastSaveTimeMS: roundTo(grid.metrics.lastSaveTimeMS, 0.01),
-    size: grid.size,
+    pixelCount: grid.metrics.pixelCount,
   };
   const infoString = JSON.stringify(info, null, 2);
   return <div>

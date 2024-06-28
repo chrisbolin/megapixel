@@ -48,6 +48,7 @@ export class Grid {
   createdAt: number;
   metrics: {
     lastSaveTimeMS: number;
+    pixelCount: number;
   };
 
   constructor(params: GridCore) {
@@ -62,7 +63,8 @@ export class Grid {
     this.pageSize = params.viewportSize - 1;
     this.notify = () => { };
     this.metrics = {
-      lastSaveTimeMS: 0
+      lastSaveTimeMS: 0,
+      pixelCount: countPixelsIn2DArray(params.array),
     };
   }
 
@@ -126,6 +128,7 @@ export class Grid {
     this.array[y][x] = value;
 
     this.updatedAt = Date.now();
+    this.metrics.pixelCount++;
     this.save();
   }
 
@@ -235,4 +238,14 @@ export function loadMostRecentGrid(): Grid | null {
   if (!core || core.id === undefined) return null;
 
   return new Grid(core);
+}
+
+function countPixelsIn2DArray(array: GridArray) {
+  let count = 0;
+  array.forEach(row => {
+    if (row) row.forEach(element => {
+      if (typeof element === 'number') count++;
+    })
+  });
+  return count;
 }
