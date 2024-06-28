@@ -225,7 +225,11 @@ function saveGrid(grid: Grid) {
 function loadGridCore(gridId: string): GridCore | null {
   const json = localStorage.getItem(gridId);
   if (!json) return null;
-  return JSON.parse(json);
+  const core = JSON.parse(json);
+  return {
+    array: core?.data, // migration
+    ...core
+  };
 }
 
 export function loadMostRecentGrid(): Grid | null {
