@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 
 import './App.css';
 
 import { Grid, useGrid, Palette, FreshGridParams, NullableString, loadMostRecentGrid, newGridFromJSON, FreshGrid } from './Grid';
 import { copyTextToClipboard, getTextFromClipboard, roundTo } from './utils';
+import { Menu } from './Menu';
 
 function useAppState(defaultGridParams: FreshGridParams) {
   const [colorIndex, setColorIndex] = useState(0);
-  const [view, setView] = useState('canvas');
+  const [view, setView] = useState('drawing');
   const gridForState = loadMostRecentGrid() || new FreshGrid(defaultGridParams);
   const [grid, setGrid] = useGrid(gridForState);
 
@@ -21,7 +22,15 @@ function useAppState(defaultGridParams: FreshGridParams) {
   };
 }
 
-type AppState = ReturnType<typeof useAppState>;
+export type AppState = ReturnType<typeof useAppState>;
+
+const viewConfigs = [
+  { key: 'drawing' },
+  { key: 'debug' },
+  { key: 'settings' },
+];
+
+export type ViewConfigs = typeof viewConfigs;
 
 function Box(
   { color, xIndex, yIndex, pixelsPerBox }:
@@ -110,10 +119,10 @@ function ColorPicker({ state, palette }: { state: AppState, palette: Palette }) 
 
 function ViewportPicker({ state }: { state: AppState }) {
   return <div className="ViewportPicker">
-    <button onClick={() => state.grid.moveViewportByPage(-1, 0)}>{'< back'}</button>
-    <button onClick={() => state.grid.moveViewportByPage(1, 0)}>{'next >'}</button>
-    <button onClick={() => state.grid.moveViewportByPage(0, -1)}>{'^ up'}</button>
-    <button onClick={() => state.grid.moveViewportByPage(0, 1)}>{'v down'}</button>
+    <button className="colorful" onClick={() => state.grid.moveViewportByPage(-1, 0)}>{'< back'}</button>
+    <button className="colorful" onClick={() => state.grid.moveViewportByPage(1, 0)}>{'next >'}</button>
+    <button className="colorful" onClick={() => state.grid.moveViewportByPage(0, -1)}>{'^ up'}</button>
+    <button className="colorful" onClick={() => state.grid.moveViewportByPage(0, 1)}>{'v down'}</button>
   </div>;
 }
 
@@ -130,32 +139,41 @@ function DebugInfo({ grid }: { grid: Grid }) {
   </div>;
 }
 
+function Render({ when, children } : { when: boolean, children: ReactElement[] | ReactElement }){
+  if (when) return <>{children}</>;
+  return null;
+}
+
 function App() {
   const viewportSize = 9;
   const palette = ['blue', 'red', 'yellow'];
   const state = useAppState({ viewportSize, palette });
-  const pixelsPerBox = 30;
-  const widthInBoxes = viewportSize;
-  const heightInBoxes = viewportSize;
   return (
     <div className="App">
-      <GridCanvas
-        widthInBoxes={widthInBoxes}
-        heightInBoxes={heightInBoxes}
-        state={state}
-        pixelsPerBox={pixelsPerBox}
-      />
-      <ColorPicker state={state} palette={palette} />
-      <ViewportPicker state={state} />
-      <button onClick={() => copyTextToClipboard(state.grid.toJSON())}>copy grid to clipboard</button>
-      <button onClick={async () => {
-        const json = await getTextFromClipboard();
-        const newGrid = newGridFromJSON(json);
-        if (newGrid) {
-          state.setGrid(newGrid);
-        }
-      }}>open grid from clipboard</button>
-      <DebugInfo grid={state.grid} />
+      <Render when={state.view === 'drawing'}>
+        <GridCanvas
+          widthInBoxes={viewportSize}
+          heightInBoxes={viewportSize}
+          state={state}
+          pixelsPerBox={30}
+          />
+        <ColorPicker state={state} palette={palette} />
+        <ViewportPicker state={state} />
+      </Render>
+      <Render when={state.view === 'settings'}>
+        <button className="colorful giant" onClick={() => copyTextToClipboard(state.grid.toJSON())}>copy grid to clipboard</button>
+        <button className="colorful giant" onClick={async () => {
+          const json = await getTextFromClipboard();
+          const newGrid = newGridFromJSON(json);
+          if (newGrid) {
+            state.setGrid(newGrid);
+          }
+        }}>open grid from clipboard</button>
+      </Render>
+      <Render when={state.view === 'debug'}>
+        <DebugInfo grid={state.grid} />
+      </Render>
+      <Menu state={state} viewConfigs={viewConfigs} />
     </div>
   );
 }
