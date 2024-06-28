@@ -1,5 +1,5 @@
 import { AppState } from "./App";
-import { newGridFromJSON } from "./Grid";
+import { FreshGrid, newGridFromJSON } from "./Grid";
 import { copyTextToClipboard, getTextFromClipboard, roundTo } from './utils';
 
 export function Settings({ state }: { state: AppState }) {
@@ -19,12 +19,23 @@ export function Settings({ state }: { state: AppState }) {
     }
   };
 
+  const onNewClick = () => {
+    state.setGrid(new FreshGrid({
+      palette: state.grid.palette,
+      viewportSize: state.grid.viewportSize,
+    }));
+    alert('New Grid');
+  };
+
   return <>
     <button className="colorful giant" onClick={onCopyClick}>
       copy grid
     </button>
     <button className="colorful giant" onClick={onPasteClick}>
       paste grid
+    </button>
+    <button className="colorful giant" onClick={onNewClick}>
+      new grid
     </button>
   </>;
 }
