@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 
 import './App.css';
 
-import { Grid, useGrid, Palette, GridContructorParams, NullableString, loadMostRecentGrid, newGridFromJSON } from './Grid';
+import { Grid, useGrid, Palette, FreshGridParams, NullableString, loadMostRecentGrid, newGridFromJSON, FreshGrid } from './Grid';
 import { copyTextToClipboard, getTextFromClipboard, roundTo } from './utils';
 
-function useAppState(defaultGridParams: GridContructorParams) {
+function useAppState(defaultGridParams: FreshGridParams) {
   const [colorIndex, setColorIndex] = useState(0);
   const [view, setView] = useState('canvas');
-  const gridForState = loadMostRecentGrid() || new Grid(defaultGridParams);
+  const gridForState = loadMostRecentGrid() || new FreshGrid(defaultGridParams);
   const [grid, setGrid] = useGrid(gridForState);
 
   return {

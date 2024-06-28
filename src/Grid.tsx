@@ -7,22 +7,27 @@ export type NullableString = string | null;
 
 export type GridData = Array<Array<NullableNumber>>;
 
-export type GridContructorParams = {
+type ViewportCorner = { x: number, y: number };
+
+type GridCore = {
+  id: string,
+  data: GridData,
+  viewportSize: number,
+  viewportCorner: ViewportCorner,
+  palette: Palette,
+  createdAt: number,
+  updatedAt: number,
+}
+
+export type FreshGridParams = {
   viewportSize: number,
   palette: Palette,
-  data?: GridData,
-  createdAt?: number,
-  updatedAt?: number,
-  id?: string,
-  viewportCorner?: { x: number, y: number },
 };
 
 export type Palette = Array<string>;
 
 const STORAGE_KEYS = {
   ALL_GRID_IDS: 'grids',
-  SUFFIX_GRID_METADATA: '',
-  SUFFIX_GRID_DATA: '_data',
 };
 
 const COLOR_OUT_OF_BOUNDS = 'darkgrey';
@@ -45,22 +50,23 @@ export class Grid {
     lastSaveTimeMS: number;
   };
 
-  constructor(params: GridContructorParams) {
-    this.data = params.data?.map(row => row || []) || [];
+  constructor(params: GridCore) {
+    this.data = params.data;
     this.viewportSize = params.viewportSize;
+    this.viewportCorner = params.viewportCorner;
+    this.palette = params.palette;
+    this.createdAt = params.createdAt;
+    this.updatedAt = params.updatedAt;
+    this.id = params.id;
+
     this.pageSize = params.viewportSize - 1;
     this.notify = () => { };
-    this.viewportCorner = params.viewportCorner || { x: -1, y: -1 };
-    this.palette = params.palette;
-    this.id = params.id || makeGridId();
-    this.createdAt = params.createdAt || Date.now();
-    this.updatedAt = Date.now();
     this.metrics = {
       lastSaveTimeMS: 0,
     };
   }
 
-  get coreData(): GridContructorParams {
+  get core(): GridCore {
     // everything needed to revive the Grid
     return {
       id: this.id,
@@ -124,7 +130,7 @@ export class Grid {
   }
 
   toJSON() {
-    return JSON.stringify(this.coreData);
+    return JSON.stringify(this.core);
   }
 
   save() {
@@ -165,6 +171,22 @@ export class Grid {
   }
 }
 
+export class FreshGrid extends Grid {
+  constructor(freshParams: FreshGridParams) {
+    const core : GridCore = {
+      data: [],
+      viewportCorner: { x: -1, y: -1 },
+      id: makeGridId(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      viewportSize: freshParams.viewportSize,
+      palette: freshParams.palette,
+    };
+    super(core);
+  }
+}
+
+
 export function useGrid(grid: Grid): [Grid, (newGrid: Grid) => void] {
   const [gridInState, _setGridInState] = useState(grid);
   const [count, setCounter] = useState(0);
@@ -193,34 +215,24 @@ function listSavedGridIds(): Array<string> {
 
 function saveGrid(grid: Grid) {
   const gridIds = listSavedGridIds();
-  localStorage.setItem(grid.id + STORAGE_KEYS.SUFFIX_GRID_METADATA, JSON.stringify(grid.coreData));
-  localStorage.setItem(grid.id + STORAGE_KEYS.SUFFIX_GRID_DATA, JSON.stringify(grid.data));
+  localStorage.setItem(grid.id, JSON.stringify(grid.core));
   localStorage.setItem(STORAGE_KEYS.ALL_GRID_IDS, JSON.stringify(addToSetArray(gridIds, grid.id)));
 }
 
-function loadGridMetadata(gridId: string): GridContructorParams | null {
-  const json = localStorage.getItem(gridId + STORAGE_KEYS.SUFFIX_GRID_METADATA);
-  if (!json) return null;
-  return JSON.parse(json);
-}
-
-function loadGridData(gridId: string): GridData | null {
-  const json = localStorage.getItem(gridId + STORAGE_KEYS.SUFFIX_GRID_DATA);
+function loadGridCore(gridId: string): GridCore | null {
+  const json = localStorage.getItem(gridId);
   if (!json) return null;
   return JSON.parse(json);
 }
 
 export function loadMostRecentGrid(): Grid | null {
-  const metadatas = listSavedGridIds().map(loadGridMetadata).sort((a, b) => {
+  const cores = listSavedGridIds().map(loadGridCore).sort((a, b) => {
     if (!a?.updatedAt) return 1;
     if (!b?.updatedAt) return -1;
     return b.updatedAt - a.updatedAt;
   });
-  const metadata = metadatas[0];
-  if (!metadata || metadata.id === undefined) return null;
+  const core = cores[0];
+  if (!core || core.id === undefined) return null;
 
-  const data = loadGridData(metadata.id);
-  if (data === null) return null;
-
-  return new Grid({ ...metadata, data });
+  return new Grid(core);
 }
