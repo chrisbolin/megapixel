@@ -3,8 +3,9 @@ import React, { ReactElement, useState } from 'react';
 import './App.css';
 
 import { Grid, useGrid, Palette, FreshGridParams, NullableString, loadMostRecentGrid, newGridFromJSON, FreshGrid } from './Grid';
-import { copyTextToClipboard, getTextFromClipboard, roundTo } from './utils';
+import { roundTo } from './utils';
 import { Menu } from './Menu';
+import { Settings } from './Settings';
 
 function useAppState(defaultGridParams: FreshGridParams) {
   const [colorIndex, setColorIndex] = useState(0);
@@ -161,14 +162,7 @@ function App() {
         <ViewportPicker state={state} />
       </Render>
       <Render when={state.view === 'settings'}>
-        <button className="colorful giant" onClick={() => copyTextToClipboard(state.grid.toJSON())}>copy grid to clipboard</button>
-        <button className="colorful giant" onClick={async () => {
-          const json = await getTextFromClipboard();
-          const newGrid = newGridFromJSON(json);
-          if (newGrid) {
-            state.setGrid(newGrid);
-          }
-        }}>open grid from clipboard</button>
+        <Settings state={state} />
       </Render>
       <Render when={state.view === 'debug'}>
         <DebugInfo grid={state.grid} />
