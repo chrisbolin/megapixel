@@ -17,9 +17,11 @@
   background-color: lightpink;
 }
 
-.ViewportPicker button {
+.DPad button {
   min-width: 25%;
   min-height: 2em;
+  font-size: 2em;
+  padding: 1em 0;
 }
 
 .MenuMinimized {

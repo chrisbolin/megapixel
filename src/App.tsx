@@ -118,12 +118,12 @@ function ColorPicker({ state, palette }: { state: AppState, palette: Palette }) 
   </svg>;
 }
 
-function ViewportPicker({ state }: { state: AppState }) {
-  return <div className="ViewportPicker">
-    <button className="colorful" onClick={() => state.grid.moveViewportByPage(-1, 0)}>{'< back'}</button>
-    <button className="colorful" onClick={() => state.grid.moveViewportByPage(1, 0)}>{'next >'}</button>
-    <button className="colorful" onClick={() => state.grid.moveViewportByPage(0, -1)}>{'^ up'}</button>
-    <button className="colorful" onClick={() => state.grid.moveViewportByPage(0, 1)}>{'v down'}</button>
+function DPad({ state }: { state: AppState }) {
+  return <div className="DPad">
+    <button className="colorful" onClick={() => state.grid.moveViewportByPage(-1, 0)}> ← </button>
+    <button className="colorful" onClick={() => state.grid.moveViewportByPage(1, 0)}> → </button>
+    <button className="colorful" onClick={() => state.grid.moveViewportByPage(0, -1)}> ↑ </button>
+    <button className="colorful" onClick={() => state.grid.moveViewportByPage(0, 1)}> ↓ </button>
   </div>;
 }
 
@@ -159,7 +159,7 @@ function App() {
           pixelsPerBox={30}
           />
         <ColorPicker state={state} palette={palette} />
-        <ViewportPicker state={state} />
+        <DPad state={state} />
       </Render>
       <Render when={state.view === 'settings'}>
         <Settings state={state} />
