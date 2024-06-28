@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/megapixel/static/css/main.1b879a87.css",
+    "main.js": "/megapixel/static/js/main.114741da.js",
+    "static/js/453.c5e3c876.chunk.js": "/megapixel/static/js/453.c5e3c876.chunk.js",
+    "index.html": "/megapixel/index.html",
+    "main.1b879a87.css.map": "/megapixel/static/css/main.1b879a87.css.map",
+    "main.114741da.js.map": "/megapixel/static/js/main.114741da.js.map",
+    "453.c5e3c876.chunk.js.map": "/megapixel/static/js/453.c5e3c876.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1b879a87.css",
+    "static/js/main.114741da.js"
+  ]
+}
