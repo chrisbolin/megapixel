@@ -1,6 +1,6 @@
 import { AppState } from "./App";
 import { FreshGrid, newGridFromJSON } from "./Grid";
-import { copyTextToClipboard, getTextFromClipboard, roundTo } from './utils';
+import { copyTextToClipboard, getTextFromClipboard } from './utils';
 
 export function Settings({ state }: { state: AppState }) {
   const onCopyClick = async () => {

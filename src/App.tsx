@@ -2,7 +2,7 @@ import React, { ReactElement, useState } from 'react';
 
 import './App.css';
 
-import { Grid, useGrid, Palette, FreshGridParams, NullableString, loadMostRecentGrid, newGridFromJSON, FreshGrid } from './Grid';
+import { Grid, useGrid, Palette, FreshGridParams, NullableString, loadMostRecentGrid, FreshGrid } from './Grid';
 import { roundTo } from './utils';
 import { Menu } from './Menu';
 import { Settings } from './Settings';

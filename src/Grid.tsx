@@ -5,13 +5,13 @@ export type NullableNumber = number | null;
 
 export type NullableString = string | null;
 
-export type GridData = Array<Array<NullableNumber>>;
+export type GridArray = Array<Array<NullableNumber>>;
 
 type ViewportCorner = { x: number, y: number };
 
 type GridCore = {
   id: string,
-  data: GridData,
+  array: GridArray,
   viewportSize: number,
   viewportCorner: ViewportCorner,
   palette: Palette,
@@ -37,7 +37,7 @@ function makeGridId(): string {
 }
 
 export class Grid {
-  data: GridData;
+  array: GridArray;
   notify: Function;
   viewportSize: number;
   pageSize: number;
@@ -51,7 +51,7 @@ export class Grid {
   };
 
   constructor(params: GridCore) {
-    this.data = params.data;
+    this.array = params.array;
     this.viewportSize = params.viewportSize;
     this.viewportCorner = params.viewportCorner;
     this.palette = params.palette;
@@ -62,7 +62,7 @@ export class Grid {
     this.pageSize = params.viewportSize - 1;
     this.notify = () => { };
     this.metrics = {
-      lastSaveTimeMS: 0,
+      lastSaveTimeMS: 0
     };
   }
 
@@ -70,7 +70,7 @@ export class Grid {
     // everything needed to revive the Grid
     return {
       id: this.id,
-      data: this.data,
+      array: this.array,
       viewportSize: this.viewportSize,
       palette: this.palette,
       createdAt: this.createdAt,
@@ -80,15 +80,15 @@ export class Grid {
   }
 
   get size(): [number, number] {
-    const ySize = this.data.length;
-    const rowLengths = this.data.map(row => row.length).filter(Boolean);
+    const ySize = this.array.length;
+    const rowLengths = this.array.map(row => row.length).filter(Boolean);
     const xSize = Math.max(...rowLengths, 0);
     return [xSize, ySize];
   }
 
   valueAt(xIndex: number, yIndex: number): NullableNumber {
     if (xIndex < 0 || yIndex < 0) return -1;
-    const row = this.data[yIndex] || [];
+    const row = this.array[yIndex] || [];
     const value = row[xIndex];
     if (value === undefined) return null;
     return value;
@@ -123,7 +123,7 @@ export class Grid {
     if (x < 0 || y < 0) return; // don't draw on negative indexes
 
     this.ensureRow(y);
-    this.data[y][x] = value;
+    this.array[y][x] = value;
 
     this.updatedAt = Date.now();
     this.save();
@@ -141,8 +141,8 @@ export class Grid {
   };
 
   ensureRow(yIndex: number) {
-    if (!this.data[yIndex]) {
-      this.data[yIndex] = [];
+    if (!this.array[yIndex]) {
+      this.array[yIndex] = [];
     }
   }
 
@@ -174,7 +174,7 @@ export class Grid {
 export class FreshGrid extends Grid {
   constructor(freshParams: FreshGridParams) {
     const core : GridCore = {
-      data: [],
+      array: [],
       viewportCorner: { x: -1, y: -1 },
       id: makeGridId(),
       createdAt: Date.now(),
