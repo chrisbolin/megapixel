@@ -17,6 +17,8 @@ type GridCore = {
   palette: Palette,
   createdAt: number,
   updatedAt: number,
+  // legacy
+  data?: GridArray,
 }
 
 export type FreshGridParams = {
@@ -52,7 +54,7 @@ export class Grid {
   };
 
   constructor(params: GridCore) {
-    this.array = params.array;
+    this.array = params.array || params?.data;
     this.viewportSize = params.viewportSize;
     this.viewportCorner = params.viewportCorner;
     this.palette = params.palette;
@@ -64,8 +66,9 @@ export class Grid {
     this.notify = () => { };
     this.metrics = {
       lastSaveTimeMS: 0,
-      pixelCount: countPixelsIn2DArray(params.array),
+      pixelCount: countPixelsIn2DArray(this.array),
     };
+
   }
 
   get core(): GridCore {
@@ -207,6 +210,7 @@ export function newGridFromJSON(json: string): Grid | null {
   try {
     return new Grid(JSON.parse(json));
   } catch (error) {
+    console.error(error);
     return null;
   }
 }
@@ -225,11 +229,7 @@ function saveGrid(grid: Grid) {
 function loadGridCore(gridId: string): GridCore | null {
   const json = localStorage.getItem(gridId);
   if (!json) return null;
-  const core = JSON.parse(json);
-  return {
-    array: core?.data, // migration
-    ...core
-  };
+  return JSON.parse(json);
 }
 
 export function loadMostRecentGrid(): Grid | null {
